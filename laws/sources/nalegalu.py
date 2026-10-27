@@ -48,6 +48,8 @@ _NAMED_PART = re.compile(r"^(?:CZĘŚĆ|Część)\s+(OGÓLNA|SZCZEGÓLNA|WOJSKOW
 _HEADING = re.compile(r"^(#{2,6})\s+(.*)$")
 _ARTICLE = re.compile(rf"^\*\*Art\.\s*({_NUM})\.\*\*\s*(.*)$")
 _TOP_PARAGRAPH = re.compile(rf"^\*\*§\s*({_NUM})\.\*\*\s*(.*)$")
+# Many regulations print their basic unit without bold: "§ 1. Text".
+_PLAIN_TOP_PARAGRAPH = re.compile(rf"^§\s*({_NUM})\.(?:\s+(.*)|$)")
 _PARAGRAPH = re.compile(rf"^(?:§\s*)?({_NUM})\.(?:\s+(.*)|$)")
 _LIST_ITEM = re.compile(r"^( *)- (?:\*\*([^*]+)\*\*\s*)?(.*)$")
 _POINT_LABEL = re.compile(rf"^({_NUM})\)$")
@@ -88,7 +90,12 @@ def _split_frontmatter(raw: str) -> tuple[dict, str]:
     if not raw.startswith("---"):
         return {}, raw
     _, fm, body = raw.split("---", 2)
-    return yaml.safe_load(fm) or {}, body
+    try:
+        return yaml.safe_load(fm) or {}, body
+    except yaml.YAMLError:
+        # A few files have stray tabs or quotes; the fields we need are flat.
+        pairs = (line.split(":", 1) for line in fm.splitlines() if ":" in line)
+        return {k.strip(): v.strip().strip('"') for k, v in pairs}, body
 
 
 def _table_field(body: str, name: str) -> str | None:
@@ -162,11 +169,16 @@ def parse_body(body: str) -> Unit:
             _inline_paragraph(m.group(2), push, append_text)
             continue
 
-        if m := _TOP_PARAGRAPH.match(stripped):
+        top = _TOP_PARAGRAPH.match(stripped)
+        if top is None and not _inside_statute_article(stack):
+            # Outside an "Art." a plain "§ N." is a regulation's basic unit; inside
+            # one (codes: "Art. 92. § 1.") it is a paragraph, handled below.
+            top = _PLAIN_TOP_PARAGRAPH.match(stripped)
+        if top:
             started = True
             # Regulations use "§ N." as their basic unit, i.e. at article level.
-            push(Unit("article", m.group(1), f"§ {m.group(1)}.", segment=f"par_{m.group(1)}"))
-            _inline_paragraph(m.group(2), push, append_text)
+            push(Unit("article", top.group(1), f"§ {top.group(1)}.", segment=f"par_{top.group(1)}"))
+            _inline_paragraph(top.group(2) or "", push, append_text)
             continue
 
         if not started:
@@ -220,6 +232,10 @@ def _container(text: str) -> Unit | None:
 
 def _inside_provision(stack: list[Unit]) -> bool:
     return any(u.kind == "article" for u in stack)
+
+
+def _inside_statute_article(stack: list[Unit]) -> bool:
+    return any(u.kind == "article" and u.label.startswith("Art.") for u in stack)
 
 
 def _last_text(stack: list[Unit]) -> str:

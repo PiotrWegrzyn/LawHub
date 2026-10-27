@@ -36,3 +36,24 @@ class NalegaluParserTests(SimpleTestCase):
         # "... z zastrzeżeniem art." followed by a bare "1." is one sentence, not ust. 1.
         self.assertEqual(self.units["art_2/par_2/pt_2/lit_b"].text, "co rok, z zastrzeżeniem art. 1.")
         self.assertNotIn("art_2/par_1~2", self.units)
+
+
+class RegulationWithPlainParagraphsTests(SimpleTestCase):
+    """Regulations whose basic unit is a plain (not bold) "§ N." and whose
+    frontmatter isn't valid YAML (a stray tab)."""
+
+    def setUp(self):
+        self.text = nalegalu.load_act(nalegalu.find_act_dir(FIXTURES, "DU/2099/2"))
+        self.units = {u.address: u for u, _ in self.text.root.walk()}
+
+    def test_metadata_survives_broken_yaml(self):
+        self.assertEqual(self.text.act.act_type, "regulation")
+        self.assertEqual(self.text.act.status, "obowiązujący")
+
+    def test_plain_section_signs_are_top_level_units(self):
+        top = [u.address for u in self.text.root.children]
+        self.assertEqual(top, ["par_1", "par_2", "par_3"])
+        self.assertEqual(self.units["par_1/pt_2"].text, "wzory protokołów.")
+        self.assertEqual(self.units["par_2/par_1"].text, "Test przeprowadza się corocznie.")
+        self.assertEqual(self.units["par_2/par_2"].text, "Test dokumentuje się protokołem.")
+        self.assertIn("zarządza się", self.text.root.text)
