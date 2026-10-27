@@ -22,3 +22,9 @@ follow tags; their own AI can connect over MCP. See README.md for the model.
 - UI text is Polish; code, comments and commits are English.
 - MCP tools call the ORM through `sync_to_async`; tests call the sync `_impl` functions directly
   (sync_to_async's second connection can't see a TestCase transaction on SQLite).
+
+## Deployment
+- `infra/`: Terraform for Cloud Run, Secret Manager, Artifact Registry, Workload Identity Federation and the
+  billing kill switch. Terraform owns config; the deploy workflow only swaps the image (`ignore_changes` on image).
+- Workflows: `ci.yml` (tests on Postgres 17), `deploy.yml` (main only), `import-data.yml`, `backup.yml`.
+- Cloud Run must stay at max 1 instance / min 0 (cost guard). Don't add Cloud SQL or load balancers without asking.

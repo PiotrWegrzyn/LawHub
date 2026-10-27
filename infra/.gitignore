@@ -1,0 +1,6 @@
+.terraform/
+.build/
+*.tfvars
+!terraform.tfvars.example
+*.tfstate*
+.terraform.lock.hcl.bak

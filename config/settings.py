@@ -78,8 +78,13 @@ DATABASES = {
     "default": dj_database_url.config(
         default=f"sqlite:///{BASE_DIR / 'data' / 'lawhub.sqlite3'}",
         conn_max_age=600,
+        conn_health_checks=True,
     )
 }
+if "-pooler." in DATABASES["default"].get("HOST", ""):
+    # Neon's pooled endpoint runs PgBouncer in transaction mode, which can't
+    # keep server-side cursors open across queries.
+    DATABASES["default"]["DISABLE_SERVER_SIDE_CURSORS"] = True
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},

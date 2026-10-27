@@ -1,0 +1,24 @@
+name: Database backup
+
+# Daily pg_dump of the Neon database, kept as a workflow artifact for 14 days.
+# Needs the repository secret NEON_DIRECT_URL: Neon's *direct* (non-pooler)
+# connection string; pg_dump doesn't work through the transaction pooler.
+on:
+  schedule:
+    - cron: "17 2 * * *"
+  workflow_dispatch:
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    container: postgres:17 # pg_dump must be at least the server's major version
+    steps:
+      - name: Dump
+        env:
+          NEON_DIRECT_URL: ${{ secrets.NEON_DIRECT_URL }}
+        run: pg_dump --format=custom --no-owner --file=lawhub.dump "$NEON_DIRECT_URL"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lawhub-db-${{ github.run_id }}
+          path: lawhub.dump
+          retention-days: 14

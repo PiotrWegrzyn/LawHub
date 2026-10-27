@@ -110,7 +110,7 @@ how a change lands.
 3. Notifications (email first), Postgres + full-text search.
 4. Local law (wojewódzkie dzienniki urzędowe, e.g. Kraków's clean transport
    zone), EU law (EUR-Lex), then other countries.
-5. Terraform for hosting.
+5. ~~Terraform for hosting~~ done: see [infra/README.md](infra/README.md).
 
 ## Connect your AI (MCP)
 
@@ -124,3 +124,9 @@ Set `LAWHUB_PUBLIC_URL` to the public https URL in production.
 
 Private beta: `LAWHUB_PRIVATE=1` requires login on every page, and
 `LAWHUB_SIGNUP_ALLOWLIST=a@x.com,b@y.com` limits who can sign up.
+
+## Deployment
+
+Cloud Run + Neon Postgres, provisioned with Terraform and deployed by GitHub
+Actions on every push to `main`, with spending guards. Step-by-step:
+[infra/README.md](infra/README.md).
