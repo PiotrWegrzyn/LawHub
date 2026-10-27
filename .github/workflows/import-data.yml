@@ -1,0 +1,40 @@
+name: Import law data
+
+# Loads the beta corpus from nalegalu into the hosted database.
+# Needs the repository secret DATABASE_URL (the hosted Postgres connection string).
+on:
+  workflow_dispatch:
+    inputs:
+      seed:
+        description: Seed file in laws/sources/seeds (without .toml)
+        default: pl_driving
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install -e ".[postgres]"
+      - name: Fetch only the seeded acts from nalegalu (the full repo is ~1.2 GB)
+        run: |
+          git clone --depth 1 --filter=blob:none --sparse https://github.com/nalegaluorg/nalegalu ../nalegalu
+          dirs=$(python - <<'PY'
+          import tomllib
+          acts = tomllib.load(open("laws/sources/seeds/${{ inputs.seed }}.toml", "rb"))["acts"]
+          for a in acts:
+              pub, year, pos = a["eli"].split("/")
+              print(f"*/W{pub}{year}???{int(pos):04d}")
+          PY
+          )
+          git -C ../nalegalu sparse-checkout set --no-cone $dirs
+      - name: Import
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DJANGO_DEBUG: "0"
+          DJANGO_SECRET_KEY: import-only
+        run: |
+          python manage.py migrate --noinput
+          python manage.py import_nalegalu --seed ${{ inputs.seed }} --nalegalu ../nalegalu
