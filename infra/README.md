@@ -19,7 +19,14 @@ repository is allowed to.
 ## One-time setup
 
 You need [gcloud](https://cloud.google.com/sdk/docs/install) and
-[Terraform](https://developer.hashicorp.com/terraform/install) installed locally.
+[Terraform](https://developer.hashicorp.com/terraform/install). Google Cloud
+Shell has gcloud but not Terraform; install it into your home directory there:
+
+```bash
+mkdir -p ~/bin && curl -fsSL -o /tmp/tf.zip https://releases.hashicorp.com/terraform/1.17.0/terraform_1.17.0_linux_amd64.zip \
+  && unzip -o /tmp/tf.zip terraform -d ~/bin
+echo 'export PATH="$HOME/bin:$PATH"' >> ~/.bashrc && export PATH="$HOME/bin:$PATH"
+```
 
 ### 1. Neon (database)
 
