@@ -28,6 +28,12 @@ You need [gcloud](https://cloud.google.com/sdk/docs/install) and
 2. On the dashboard, copy two connection strings:
    - **pooled** (connection pooling on, host contains `-pooler`) for the app,
    - **direct** (pooling off) for backups and the data import.
+3. Put the **pooled** one into Google Secret Manager (keeps the password out
+   of Terraform): console → *Security → Secret Manager* (enable the API if
+   asked) → *Create secret*, name **`lawhub-database-url`**, value = the
+   pooled connection string. Or from a terminal:
+   `printf '%s' '<pooled url>' | gcloud secrets create lawhub-database-url --data-file=-`
+4. Put the **direct** one into GitHub as the secret `NEON_DIRECT_URL` (step 4 below).
 
 ### 2. Google Cloud project
 
@@ -47,7 +53,7 @@ gcloud storage buckets create gs://<project-id>-tfstate --location=europe-west1 
 
 ```bash
 cd infra
-cp terraform.tfvars.example terraform.tfvars   # fill in project, billing account, pooled Neon URL, your email
+cp terraform.tfvars.example terraform.tfvars   # fill in project, billing account, your email
 terraform init -backend-config="bucket=<project-id>-tfstate"
 terraform apply
 ```

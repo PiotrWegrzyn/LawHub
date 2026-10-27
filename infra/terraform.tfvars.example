@@ -1,6 +1,5 @@
 # Copy to terraform.tfvars (gitignored) and fill in.
-project_id         = "lawhub-beta-123456"
+project_id         = "law-hub-512902"
 billing_account_id = "XXXXXX-XXXXXX-XXXXXX"
 budget_amount      = 5 # in your billing account's currency
-database_url       = "postgresql://USER:PASSWORD@ep-xxxx-pooler.eu-central-1.aws.neon.tech/lawhub?sslmode=require"
 signup_allowlist   = ["you@example.com"]

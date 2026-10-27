@@ -26,12 +26,6 @@ variable "github_repository" {
   default     = "PiotrWegrzyn/LawHub"
 }
 
-variable "database_url" {
-  description = "Neon *pooled* connection string (host contains -pooler)."
-  type        = string
-  sensitive   = true
-}
-
 variable "signup_allowlist" {
   description = "Emails allowed to sign up during the private beta."
   type        = list(string)

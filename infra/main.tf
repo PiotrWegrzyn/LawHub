@@ -62,9 +62,8 @@ resource "random_password" "django_secret_key" {
   special = false
 }
 
-resource "google_secret_manager_secret" "secrets" {
-  for_each  = toset(["django-secret-key", "database-url"])
-  secret_id = "lawhub-${each.value}"
+resource "google_secret_manager_secret" "django_secret_key" {
+  secret_id = "lawhub-django-secret-key"
   replication {
     auto {}
   }
@@ -72,13 +71,21 @@ resource "google_secret_manager_secret" "secrets" {
 }
 
 resource "google_secret_manager_secret_version" "django_secret_key" {
-  secret      = google_secret_manager_secret.secrets["django-secret-key"].id
+  secret      = google_secret_manager_secret.django_secret_key.id
   secret_data = random_password.django_secret_key.result
 }
 
-resource "google_secret_manager_secret_version" "database_url" {
-  secret      = google_secret_manager_secret.secrets["database-url"].id
-  secret_data = var.database_url
+# Created by hand in the console (infra/README.md), so the database password
+# never passes through Terraform variables or state.
+data "google_secret_manager_secret" "database_url" {
+  secret_id = "lawhub-database-url"
+}
+
+locals {
+  app_secrets = {
+    django_secret_key = google_secret_manager_secret.django_secret_key.id
+    database_url      = data.google_secret_manager_secret.database_url.id
+  }
 }
 
 # --- the app ------------------------------------------------------------------
@@ -89,8 +96,8 @@ resource "google_service_account" "run" {
 }
 
 resource "google_secret_manager_secret_iam_member" "run_reads_secrets" {
-  for_each  = google_secret_manager_secret.secrets
-  secret_id = each.value.id
+  for_each  = local.app_secrets
+  secret_id = each.value
   role      = "roles/secretmanager.secretAccessor"
   member    = "serviceAccount:${google_service_account.run.email}"
 }
@@ -150,7 +157,7 @@ resource "google_cloud_run_v2_service" "app" {
         name = "DJANGO_SECRET_KEY"
         value_source {
           secret_key_ref {
-            secret  = google_secret_manager_secret.secrets["django-secret-key"].secret_id
+            secret  = google_secret_manager_secret.django_secret_key.secret_id
             version = "latest"
           }
         }
@@ -159,7 +166,7 @@ resource "google_cloud_run_v2_service" "app" {
         name = "DATABASE_URL"
         value_source {
           secret_key_ref {
-            secret  = google_secret_manager_secret.secrets["database-url"].secret_id
+            secret  = data.google_secret_manager_secret.database_url.secret_id
             version = "latest"
           }
         }
@@ -188,7 +195,6 @@ resource "google_cloud_run_v2_service" "app" {
     google_project_service.apis,
     google_secret_manager_secret_iam_member.run_reads_secrets,
     google_secret_manager_secret_version.django_secret_key,
-    google_secret_manager_secret_version.database_url,
   ]
 }
 
