@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Szukaj: {{ query }} – LawHub{% endblock %}
+{% block content %}
+<h1>Wyniki dla „{{ query }}”</h1>
+{% if query|length < 3 %}<p class="muted">Wpisz co najmniej 3 znaki.</p>{% endif %}
+<ul class="results">
+  {% for pt in results %}
+    <li>
+      <a href="{{ pt.provision.get_absolute_url }}">{{ pt.provision.act.title }} – {{ pt.provision.address }}</a>
+      <p>{{ pt.label }} {{ pt.text|truncatechars:300 }}</p>
+    </li>
+  {% empty %}
+    {% if query|length >= 3 %}<p class="muted">Brak wyników.</p>{% endif %}
+  {% endfor %}
+</ul>
+{% if results|length == limit %}<p class="muted">Pokazano pierwsze {{ limit }} wyników.</p>{% endif %}
+{% endblock %}

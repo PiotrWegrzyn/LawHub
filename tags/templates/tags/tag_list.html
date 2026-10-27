@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Tematy – LawHub{% endblock %}
+{% block content %}
+<h1>Tematy</h1>
+<ul class="tag-tree">
+  {% for tag, depth in rows %}
+    <li style="--depth: {{ depth }}"><a href="{{ tag.get_absolute_url }}">{{ tag.name_pl }}</a> <code class="muted">{{ tag.slug }}</code></li>
+  {% endfor %}
+</ul>
+{% endblock %}

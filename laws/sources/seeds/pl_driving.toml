@@ -1,0 +1,41 @@
+# Core Polish driving law (beta seed). Source ids are ELI ("DU/<year>/<position>").
+# nalegalu stores current consolidated wording under the base act's id, except
+# where noted.
+
+[[acts]]
+eli = "DU/1997/602"
+name = "Prawo o ruchu drogowym"
+
+[[acts]]
+eli = "DU/2011/151"
+name = "Ustawa o kierujących pojazdami"
+
+[[acts]]
+eli = "DU/1971/114"
+name = "Kodeks wykroczeń"
+
+[[acts]]
+eli = "DU/2003/1152"
+name = "Ustawa o ubezpieczeniach obowiązkowych, UFG i PBUK"
+
+[[acts]]
+eli = "DU/1985/60"
+name = "Ustawa o drogach publicznych"
+
+[[acts]]
+eli = "DU/2001/1371"
+name = "Ustawa o transporcie drogowym"
+
+[[acts]]
+# Consolidated text (obwieszczenie) of the 2002 regulation; the base
+# regulation DU/2002/1393 is not in nalegalu.
+eli = "DU/2019/2310"
+name = "Rozporządzenie w sprawie znaków i sygnałów drogowych (t.j.)"
+
+[[acts]]
+eli = "DU/1997/553"
+name = "Kodeks karny (przestępstwa w komunikacji, rozdz. XXI)"
+
+[[acts]]
+eli = "DU/2001/1148"
+name = "Kodeks postępowania w sprawach o wykroczenia (mandaty)"

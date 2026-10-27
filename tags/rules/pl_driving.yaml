@@ -1,0 +1,94 @@
+# Driving-law tags for Poland (beta).
+#
+# tags:     the tag tree. Dotted slugs; a parent is a category, subscribing to
+#           it covers every tag below.
+# rules:    a provision gets the tag when its own text or heading matches any
+#           pattern (case-insensitive regex; use word stems for Polish
+#           inflection). Tags inherit down the provision tree, so a matching
+#           chapter heading tags every article in it.
+# acts:     whole-act tags by source id.
+# questionnaire: how onboarding answers map to suggested subscriptions.
+
+tags:
+  transport: {pl: Transport, en: Transport}
+  transport.road: {pl: Ruch drogowy, en: Road traffic}
+  transport.road.rules: {pl: Zasady ruchu, en: Traffic rules}
+  transport.road.speed: {pl: Prędkość, en: Speed}
+  transport.road.parking: {pl: Zatrzymanie, postój i parkowanie, en: Stopping and parking}
+  transport.road.signs: {pl: Znaki i sygnały drogowe, en: Road signs and signals}
+  transport.road.alcohol: {pl: Alkohol i środki odurzające, en: Alcohol and drugs}
+  transport.road.pedestrians: {pl: Piesi, en: Pedestrians}
+  transport.road.cycling: {pl: Rowery, hulajnogi i UTO, en: Bikes and e-scooters}
+  transport.road.penalties: {pl: Kary, mandaty i punkty karne, en: Fines and penalty points}
+  transport.road.clean_transport_zones: {pl: Strefy czystego transportu, en: Clean transport zones}
+  transport.road.infrastructure: {pl: Drogi publiczne, en: Public roads}
+  transport.vehicles: {pl: Pojazdy, en: Vehicles}
+  transport.vehicles.cars: {pl: Samochody osobowe, en: Passenger cars}
+  transport.vehicles.motorcycles: {pl: Motocykle i motorowery, en: Motorcycles and mopeds}
+  transport.vehicles.trucks: {pl: Samochody ciężarowe, en: Trucks}
+  transport.vehicles.registration: {pl: Rejestracja pojazdów, en: Vehicle registration}
+  transport.vehicles.inspection: {pl: Badania techniczne, en: Vehicle inspection}
+  transport.vehicles.insurance: {pl: Ubezpieczenie OC, en: Motor insurance}
+  transport.vehicles.electric: {pl: Pojazdy elektryczne, en: Electric vehicles}
+  transport.drivers: {pl: Kierowcy, en: Drivers}
+  transport.drivers.license: {pl: Prawo jazdy, en: Driving licence}
+  transport.drivers.professional: {pl: Kierowcy zawodowi, en: Professional drivers}
+  transport.commercial: {pl: Transport zarobkowy i taxi, en: Commercial transport and taxis}
+
+rules:
+  transport.road.speed: ['prędkoś', 'km/h']
+  transport.road.parking: ['postoj', 'postój', 'zatrzymani[ea] pojazd', 'parkow']
+  transport.road.signs: ['znak(?:u|i|ów|iem)? drogow', 'sygnał(?:u|y|ów)? drogow', 'sygnaliz']
+  transport.road.alcohol: ['alkohol', 'stanie nietrzeźwości', 'stanie po użyciu', 'środk(?:a|ów|i) działając(?:ego|ych) podobnie']
+  transport.road.pedestrians: ['piesz(?:y|ych|ego|ym)\b', 'przejści(?:e|a|u) dla pieszych']
+  transport.road.cycling: ['rower', 'hulajn', 'urządze(?:nie|nia|ń) transportu osobistego']
+  transport.road.penalties: ['grzywn', 'mandat', 'punkt(?:y|ów)? karn', 'karze aresztu', 'nagany']
+  transport.road.clean_transport_zones: ['stref(?:a|y|ie|ę) czystego transportu']
+  transport.road.infrastructure: ['zarządc(?:a|y|ą) drogi', 'drog(?:a|i) publiczn', 'pas(?:a|ie)? drogow']
+  transport.vehicles.cars: ['samoch(?:ód|odu|odem|odów|ody) osobow', 'pojazd(?:u|ów|em)? samochodow']
+  transport.vehicles.motorcycles: ['motocyk', 'motorower']
+  transport.vehicles.trucks: ['samoch(?:ód|odu|odem|odów|ody) ciężarow', 'ciągnik(?:a|ów)? samochodow', 'dopuszczalnej masie całkowitej przekraczającej 3,5 t']
+  transport.vehicles.registration: ['rejestracj', 'tablic(?:e|a|y|ami)? rejestracyjn', 'dowód rejestracyjn', 'dowodu rejestracyjn']
+  transport.vehicles.inspection: ['badani(?:e|a|u|om)? techniczn', 'stacj(?:a|i) kontroli pojazdów']
+  transport.vehicles.insurance: ['ubezpieczeni(?:e|a|u)? (?:obowiązkow|OC)', 'odpowiedzialności cywilnej posiadaczy pojazdów', 'Ubezpieczeniow(?:y|ego) Fundusz Gwarancyjn']
+  transport.vehicles.electric: ['pojazd(?:u|ów|em)? elektryczn', 'elektromobiln', 'ładowani(?:a|e) pojazd']
+  transport.drivers.license: ['praw(?:o|a|em) jazdy', 'egzamin(?:u|ie)? państwow', 'uprawnieni(?:e|a|em) do kierowania']
+  transport.drivers.professional: ['kierowc(?:a|y|ów) zawodow', 'czas(?:u)? pracy kierowc', 'tachograf', 'kwalifikacj(?:a|i|ę) wstępn']
+  transport.commercial: ['transport(?:u)? drogow(?:y|ego) (?:w zakresie )?(?:osób|rzeczy)', 'taksówk', 'licencj(?:a|i|ę) na wykonywanie']
+
+acts:
+  pl:DU/1997/602: [transport.road, transport.road.rules]   # Prawo o ruchu drogowym
+  pl:DU/2011/151: [transport.drivers, transport.drivers.license]  # o kierujących pojazdami
+  pl:DU/1971/114: []                                         # Kodeks wykroczeń: rules only
+  pl:DU/2019/2310: [transport.road.signs]                    # znaki i sygnały drogowe (t.j.)
+  pl:DU/2003/1152: [transport.vehicles.insurance]            # ubezpieczenia obowiązkowe
+  pl:DU/1985/60: [transport.road.infrastructure]             # o drogach publicznych
+  pl:DU/2001/1371: [transport.commercial]                    # o transporcie drogowym
+
+questionnaire:
+  has_car:
+    label: Mam samochód osobowy
+    tags: [transport.vehicles.cars, transport.vehicles.inspection, transport.vehicles.insurance,
+           transport.vehicles.registration, transport.road.rules, transport.road.speed,
+           transport.road.parking, transport.road.penalties]
+  has_motorcycle:
+    label: Jeżdżę motocyklem lub motorowerem
+    tags: [transport.vehicles.motorcycles, transport.vehicles.inspection, transport.vehicles.insurance]
+  has_electric_vehicle:
+    label: Mam auto elektryczne
+    tags: [transport.vehicles.electric]
+  cycles_or_scooters:
+    label: Jeżdżę rowerem lub hulajnogą elektryczną
+    tags: [transport.road.cycling]
+  walks:
+    label: Chodzę pieszo po mieście
+    tags: [transport.road.pedestrians]
+  is_professional_driver:
+    label: Jestem kierowcą zawodowym
+    tags: [transport.drivers.professional, transport.vehicles.trucks, transport.commercial]
+  learning_to_drive:
+    label: Robię prawo jazdy
+    tags: [transport.drivers.license]
+  lives_in_city_with_clean_transport_zone:
+    label: Mieszkam w mieście ze strefą czystego transportu (np. Kraków, Warszawa)
+    tags: [transport.road.clean_transport_zones]

@@ -64,6 +64,9 @@ class Unit:
     tail: str = ""  # wrap-up text after the sub-units ("- podlega karze grzywny")
     children: list[Unit] = field(default_factory=list)
     address: str = ""
+    # Overrides the default "<abbr>_<number>" address segment, e.g. a Polish
+    # regulation's "§ 5." is article-level but addressed as "par_5".
+    segment: str | None = None
 
     @property
     def rank(self) -> int:
@@ -81,28 +84,31 @@ class Unit:
 
 
 def assign_addresses(root: Unit) -> None:
-    """Fill in `address` for every unit in the tree, keeping them unique."""
+    """Fill in `address` for every unit in the tree, keeping them unique.
+
+    The first non-container unit under a container (or the act root) starts a
+    fresh address: in statutes that is an article ("art_5"), in Polish
+    regulations it is a top-level paragraph ("par_5", printed "§ 5.").
+    """
     seen: dict[str, int] = {}
 
     def visit(unit: Unit, container_path: str, provision_path: str) -> None:
         for idx, child in enumerate(unit.children, start=1):
-            seg = f"{KIND_ABBR[child.kind]}_{child.number or idx}"
+            seg = child.segment or f"{KIND_ABBR[child.kind]}_{child.number or idx}"
             if child.kind in CONTAINER_KINDS:
                 base = f"{container_path}/{seg}" if container_path else seg
-                next_container, next_provision = base, ""
-            elif child.kind == "article":
+            elif not provision_path:
                 base = seg
-                next_container, next_provision = container_path, base
             else:
-                base = f"{provision_path}/{seg}" if provision_path else seg
-                next_container, next_provision = container_path, base
+                base = f"{provision_path}/{seg}"
             # Parser hiccups or genuinely duplicated numbering must not collide.
             n = seen.get(base, 0) + 1
             seen[base] = n
             child.address = base if n == 1 else f"{base}~{n}"
-            if child.kind not in CONTAINER_KINDS:
-                next_provision = child.address
-            visit(child, next_container, next_provision)
+            if child.kind in CONTAINER_KINDS:
+                visit(child, child.address, "")
+            else:
+                visit(child, container_path, child.address)
 
     root.address = ""
     visit(root, "", "")

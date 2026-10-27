@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}{{ act.title }} – LawHub{% endblock %}
+{% block content %}
+<article class="act">
+  <header>
+    <p class="muted">{{ act.get_act_type_display }} · {{ act.display_address }} · {{ act.status }}</p>
+    <h1>{{ act.title }}</h1>
+    {% if version %}<p class="muted">Wersja: {{ version.label }} · commit <code>{{ version.git_commit|slice:":10" }}</code></p>{% endif %}
+    <ul class="chips">{% for tag in act_tags %}<li><a class="chip" href="{{ tag.get_absolute_url }}">{{ tag.name_pl }}</a></li>{% endfor %}</ul>
+    {% if user.is_authenticated %}
+      <form method="post" action="{% url 'accounts:follow_act' act.id %}">{% csrf_token %}<button>Obserwuj cały akt</button></form>
+    {% endif %}
+  </header>
+
+  {% for pt, tags in rows %}
+    {% with kind=pt.provision.kind %}
+    {% if kind == "act" %}
+    {% elif kind == "article" %}
+      <p class="unit article" id="{{ pt.provision.anchor }}"><a class="label" href="#{{ pt.provision.anchor }}">{{ pt.label }}</a> {{ pt.text }}{% include "laws/_unit_meta.html" %}</p>
+    {% elif pt.provision.is_container %}
+      <h2 class="unit container {{ kind }}" id="{{ pt.provision.anchor }}">{{ pt.label }} <small>{{ pt.heading }}</small>{% include "laws/_unit_meta.html" %}</h2>
+    {% else %}
+      <p class="unit depth-{{ pt.depth }}" id="{{ pt.provision.anchor }}"><a class="label" href="#{{ pt.provision.anchor }}">{{ pt.label }}</a> {{ pt.text }}{% include "laws/_unit_meta.html" %}</p>
+    {% endif %}
+    {% if pt.tail %}<p class="unit tail depth-{{ pt.depth }}">{{ pt.tail }}</p>{% endif %}
+    {% endwith %}
+  {% endfor %}
+</article>
+{% endblock %}

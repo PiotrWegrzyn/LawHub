@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %}Zaloguj – LawHub{% endblock %}
+{% block content %}
+<h1>Zaloguj się</h1>
+<form method="post">{% csrf_token %}{{ form.as_p }}<button>Zaloguj</button></form>
+<p>Nie masz konta? <a href="{% url 'accounts:signup' %}">Załóż konto</a>.</p>
+{% endblock %}

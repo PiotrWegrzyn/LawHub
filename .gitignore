@@ -1,8 +1,7 @@
 .venv/
 __pycache__/
 *.pyc
-.pytest_cache/
 *.egg-info/
-# local runtime data: the SQLite index and the separate law-content git repo
+staticfiles/
+# local runtime data: the SQLite database and the separate law-content git repo
 data/
-lawhub.db

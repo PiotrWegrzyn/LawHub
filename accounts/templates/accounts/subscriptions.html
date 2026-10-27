@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Obserwowane – LawHub{% endblock %}
+{% block content %}
+<h1>Obserwowane</h1>
+<p><a href="{% url 'accounts:questionnaire' %}">Wypełnij ankietę ponownie</a> · <a href="{% url 'tags:list' %}">Przeglądaj tematy</a></p>
+<ul class="results">
+  {% for sub in subscriptions %}
+    <li>
+      <a href="{{ sub.target.get_absolute_url }}">{% if sub.tag %}{{ sub.tag.name_pl }}{% elif sub.act %}{{ sub.act.title }}{% else %}{{ sub.provision }}{% endif %}</a>
+      {% if sub.suggested %}<span class="muted">z ankiety</span>{% endif %}
+      <form method="post" action="{% url 'accounts:unfollow' sub.pk %}" class="inline">{% csrf_token %}<button class="link">przestań obserwować</button></form>
+    </li>
+  {% empty %}
+    <p class="muted">Nic jeszcze nie obserwujesz.</p>
+  {% endfor %}
+</ul>
+{% endblock %}

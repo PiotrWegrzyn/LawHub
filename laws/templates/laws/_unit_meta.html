@@ -1,0 +1,1 @@
+{% if pt.has_pending_change %} <span class="pending" title="Tekst zawiera brzmienie przyszłe lub zastępowane">zmiana w drodze</span>{% endif %}{% for tag in tags %} <a class="chip small" href="{{ tag.get_absolute_url }}">{{ tag.name_pl }}</a>{% endfor %}

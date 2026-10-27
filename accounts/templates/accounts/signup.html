@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block title %}Załóż konto – LawHub{% endblock %}
+{% block content %}
+<h1>Załóż konto</h1>
+<form method="post">{% csrf_token %}{{ form.as_p }}<button>Dalej: ankieta</button></form>
+{% endblock %}

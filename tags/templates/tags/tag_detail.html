@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}{{ tag.name_pl }} – LawHub{% endblock %}
+{% block content %}
+<p class="muted">{% if tag.parent %}<a href="{{ tag.parent.get_absolute_url }}">{{ tag.parent.name_pl }}</a> › {% endif %}<code>{{ tag.slug }}</code></p>
+<h1>{{ tag.name_pl }}</h1>
+{% if user.is_authenticated %}
+  {% if following %}<p class="flash">Obserwujesz ten temat.</p>
+  {% else %}<form method="post" action="{% url 'accounts:follow_tag' tag.slug %}">{% csrf_token %}<button>Obserwuj temat</button></form>{% endif %}
+{% else %}
+  <p><a href="{% url 'accounts:signup' %}">Załóż konto</a>, aby dostawać powiadomienia o zmianach w tym temacie.</p>
+{% endif %}
+{% if children %}<ul class="chips">{% for child in children %}<li><a class="chip" href="{{ child.get_absolute_url }}">{{ child.name_pl }}</a></li>{% endfor %}</ul>{% endif %}
+
+<h2>Przepisy ({{ total }})</h2>
+<p class="muted">Bezpośrednio otagowane przepisy. Tag obejmuje też wszystkie jednostki pod nimi.</p>
+<ul class="results">
+  {% for pt in texts %}
+    <li>
+      <a href="{{ pt.provision.get_absolute_url }}">{{ pt.provision.act.title }} – {{ pt.provision.address|default:"cały akt" }}</a>
+      <p>{{ pt.label }} {{ pt.heading }} {{ pt.text|truncatechars:240 }}</p>
+    </li>
+  {% endfor %}
+</ul>
+{% if total > limit %}<p class="muted">Pokazano pierwsze {{ limit }}.</p>{% endif %}
+{% endblock %}

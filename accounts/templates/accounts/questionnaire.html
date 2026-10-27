@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %}Ankieta – LawHub{% endblock %}
+{% block content %}
+<h1>Co Cię dotyczy?</h1>
+<p class="muted">Na podstawie odpowiedzi zaproponujemy tematy do obserwowania. Możesz je potem zmienić.</p>
+<form method="post">{% csrf_token %}{{ form.as_p }}<button>Zapisz i pokaż propozycje</button></form>
+{% endblock %}

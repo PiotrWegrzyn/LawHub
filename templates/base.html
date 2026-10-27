@@ -1,0 +1,32 @@
+{% load static %}<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}LawHub{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="{% url 'laws:home' %}">LawHub</a>
+    <form class="search" action="{% url 'laws:search' %}">
+      <input type="search" name="q" value="{{ query|default:'' }}" placeholder="Szukaj w przepisach…" aria-label="Szukaj">
+    </form>
+    <nav>
+      <a href="{% url 'tags:list' %}">Tematy</a>
+      {% if user.is_authenticated %}
+        <a href="{% url 'accounts:subscriptions' %}">Obserwowane</a>
+        <form method="post" action="{% url 'accounts:logout' %}" class="inline">{% csrf_token %}<button class="link">Wyloguj</button></form>
+      {% else %}
+        <a href="{% url 'accounts:login' %}">Zaloguj</a>
+        <a class="button" href="{% url 'accounts:signup' %}">Załóż konto</a>
+      {% endif %}
+    </nav>
+  </header>
+  <main>
+    {% for message in messages %}<p class="flash">{{ message }}</p>{% endfor %}
+    {% block content %}{% endblock %}
+  </main>
+  <footer>Wersja beta. Teksty z bazy <a href="https://github.com/nalegaluorg/nalegalu">nalegalu</a> (CC0). Jedynym urzędowym źródłem prawa jest Dziennik Ustaw.</footer>
+</body>
+</html>
