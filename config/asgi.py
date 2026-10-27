@@ -19,9 +19,18 @@ mcp_app = build_asgi_app()
 MCP_PATHS = ("/mcp", "/.well-known/oauth-protected-resource")
 
 
+async def healthz(scope, receive, send):
+    """Answered before Django: platform probes may use a Host header that isn't
+    in ALLOWED_HOSTS, and the check must not need the database."""
+    await send({"type": "http.response.start", "status": 200, "headers": [(b"content-type", b"text/plain")]})
+    await send({"type": "http.response.body", "body": b"ok"})
+
+
 async def application(scope, receive, send):
+    if scope["type"] == "http" and scope["path"] == "/healthz":
+        await healthz(scope, receive, send)
     # The MCP app owns the lifespan: it starts the SDK's session manager.
-    if scope["type"] == "lifespan" or scope.get("path", "").startswith(MCP_PATHS):
+    elif scope["type"] == "lifespan" or scope.get("path", "").startswith(MCP_PATHS):
         await mcp_app(scope, receive, send)
     else:
         await django_app(scope, receive, send)

@@ -41,6 +41,22 @@ jobs:
           docker build -t "$IMAGE" .
           docker push "$IMAGE"
 
+      # Migrations run here, once per deploy, against Neon's direct endpoint,
+      # before the new revision takes traffic. Keep migrations backward
+      # compatible: the old revision serves until the new one is ready.
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Migrate database
+        env:
+          DATABASE_URL: ${{ secrets.NEON_DIRECT_URL }}
+          DJANGO_DEBUG: "0"
+          DJANGO_SECRET_KEY: migrate-only
+        run: |
+          pip install -e ".[postgres]"
+          python manage.py migrate --noinput
+
       - name: Deploy to Cloud Run
         run: |
           gcloud run deploy "${{ vars.CLOUD_RUN_SERVICE }}" \

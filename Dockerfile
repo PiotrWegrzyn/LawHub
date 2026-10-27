@@ -14,5 +14,6 @@ RUN pip install ".[postgres]" \
 RUN useradd --create-home lawhub && mkdir -p /app/data && chown -R lawhub /app/data
 USER lawhub
 
-# Hosting platforms set PORT; migrations are idempotent so running them on boot is safe.
-CMD ["sh", "-c", "python manage.py migrate --noinput && exec uvicorn config.asgi:application --host 0.0.0.0 --port ${PORT:-8000} --proxy-headers --forwarded-allow-ips='*'"]
+# Hosting platforms set PORT. Migrations run in the deploy workflow, not on
+# boot, so cold starts stay fast and the startup probe isn't waiting on them.
+CMD ["sh", "-c", "exec uvicorn config.asgi:application --host 0.0.0.0 --port ${PORT:-8000} --proxy-headers --forwarded-allow-ips='*'"]
