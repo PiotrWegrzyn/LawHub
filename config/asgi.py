@@ -19,6 +19,12 @@ mcp_app = build_asgi_app()
 MCP_PATHS = ("/mcp", "/.well-known/oauth-protected-resource")
 
 
+# /healthz serves Cloud Run's startup probe (inside the container); from the
+# internet Cloud Run's front end reserves /healthz and answers 404, so external
+# checks (deploy smoke test, uptime pings) use /health.
+HEALTH_PATHS = {"/healthz", "/health"}
+
+
 async def healthz(scope, receive, send):
     """Answered before Django: platform probes may use a Host header that isn't
     in ALLOWED_HOSTS, and the check must not need the database."""
@@ -27,7 +33,7 @@ async def healthz(scope, receive, send):
 
 
 async def application(scope, receive, send):
-    if scope["type"] == "http" and scope["path"] == "/healthz":
+    if scope["type"] == "http" and scope["path"] in HEALTH_PATHS:
         await healthz(scope, receive, send)
     # The MCP app owns the lifespan: it starts the SDK's session manager.
     elif scope["type"] == "lifespan" or scope.get("path", "").startswith(MCP_PATHS):

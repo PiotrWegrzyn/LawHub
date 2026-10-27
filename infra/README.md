@@ -88,7 +88,8 @@ limit should be $0.
 ### 5. First deploy
 
 Push or merge to `main`. The *Deploy* workflow runs the tests on Postgres,
-builds the image, deploys it and checks `/healthz`. The site is at
+builds the image, deploys it and checks `/health` (Cloud Run reserves `/healthz`
+for the public URL; the container answers both). The site is at
 `terraform output url`.
 
 ### 6. Load the law data

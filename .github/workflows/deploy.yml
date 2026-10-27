@@ -68,4 +68,4 @@ jobs:
       - name: Smoke test
         run: |
           url=$(gcloud run services describe "${{ vars.CLOUD_RUN_SERVICE }}" --project "${{ vars.GCP_PROJECT_ID }}" --region "${{ vars.GCP_REGION }}" --format 'value(status.url)')
-          curl --fail --silent --show-error --retry 5 --retry-all-errors "$url/healthz"
+          curl --fail --silent --show-error --retry 5 --retry-all-errors "$url/health"
