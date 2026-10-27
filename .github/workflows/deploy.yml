@@ -17,6 +17,8 @@ jobs:
 
   deploy:
     needs: test
+    # Skipped until the GCP variables from infra/README.md step 4 are set.
+    if: vars.GCP_WIF_PROVIDER != ''
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -24,7 +26,7 @@ jobs:
     env:
       IMAGE: ${{ vars.GCP_IMAGE_REPO }}/lawhub:${{ github.sha }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: google-github-actions/auth@v2
         with:

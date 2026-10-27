@@ -74,9 +74,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
+DATA_DIR = BASE_DIR / "data"  # local runtime data (gitignored): SQLite file, law repo
+DATA_DIR.mkdir(exist_ok=True)
+
 DATABASES = {
     "default": dj_database_url.config(
-        default=f"sqlite:///{BASE_DIR / 'data' / 'lawhub.sqlite3'}",
+        default=f"sqlite:///{DATA_DIR / 'lawhub.sqlite3'}",
         conn_max_age=600,
         conn_health_checks=True,
     )
@@ -126,6 +129,6 @@ OAUTH2_PROVIDER = {
 }
 
 # The law corpus: a separate git repository written by the importer.
-LAWHUB_LAW_REPO = Path(os.environ.get("LAWHUB_LAW_REPO", BASE_DIR / "data" / "law-repo"))
+LAWHUB_LAW_REPO = Path(os.environ.get("LAWHUB_LAW_REPO", DATA_DIR / "law-repo"))
 # Local checkout of https://github.com/nalegaluorg/nalegalu (beta data source).
 LAWHUB_NALEGALU = os.environ.get("LAWHUB_NALEGALU", "")
