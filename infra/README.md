@@ -52,6 +52,13 @@ gcloud billing accounts list                             # note the ACCOUNT_ID
 gcloud billing projects link <project-id> --billing-account <ACCOUNT_ID>
 gcloud config set project <project-id>
 
+# APIs Terraform needs before it can run (it reads the project first)
+gcloud services enable cloudresourcemanager.googleapis.com serviceusage.googleapis.com \
+  artifactregistry.googleapis.com billingbudgets.googleapis.com cloudbilling.googleapis.com \
+  cloudbuild.googleapis.com cloudfunctions.googleapis.com eventarc.googleapis.com iam.googleapis.com \
+  iamcredentials.googleapis.com pubsub.googleapis.com run.googleapis.com secretmanager.googleapis.com \
+  sts.googleapis.com storage.googleapis.com
+
 # Bucket for Terraform state
 gcloud storage buckets create gs://<project-id>-tfstate --location=europe-west1 --uniform-bucket-level-access
 ```
@@ -65,9 +72,8 @@ terraform init -backend-config="bucket=<project-id>-tfstate"
 terraform apply
 ```
 
-The first apply enables a dozen APIs; if a resource fails right after with
-"API not enabled" or a missing service agent, wait a minute and run
-`terraform apply` again.
+If a resource fails with "API not enabled" or a missing service agent right
+after the APIs were turned on, wait a minute and run `terraform apply` again.
 
 ### 4. GitHub
 
