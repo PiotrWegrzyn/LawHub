@@ -10,6 +10,6 @@ class ProfileAdmin(admin.ModelAdmin):
 
 @admin.register(Subscription)
 class SubscriptionAdmin(admin.ModelAdmin):
-    list_display = ("user", "tag", "act", "provision", "suggested")
-    list_filter = ("suggested",)
+    list_display = ("user", "tag", "act", "provision", "origin")
+    list_filter = ("origin",)
     raw_id_fields = ("provision",)

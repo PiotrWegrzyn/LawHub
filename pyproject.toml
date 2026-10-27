@@ -7,6 +7,10 @@ dependencies = [
     "django>=5.2,<7",
     "dj-database-url>=2.2",
     "pyyaml>=6",
+    "django-oauth-toolkit>=3.4,<4",
+    "mcp>=2.3,<3",
+    "uvicorn[standard]>=0.30",
+    "whitenoise>=6.7",
 ]
 
 [project.optional-dependencies]

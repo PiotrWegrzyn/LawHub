@@ -7,7 +7,7 @@
   {% for sub in subscriptions %}
     <li>
       <a href="{{ sub.target.get_absolute_url }}">{% if sub.tag %}{{ sub.tag.name_pl }}{% elif sub.act %}{{ sub.act.title }}{% else %}{{ sub.provision }}{% endif %}</a>
-      {% if sub.suggested %}<span class="muted">z ankiety</span>{% endif %}
+      {% if sub.origin != "manual" %}<span class="muted">{{ sub.get_origin_display|lower }}</span>{% endif %}
       <form method="post" action="{% url 'accounts:unfollow' sub.pk %}" class="inline">{% csrf_token %}<button class="link">przestań obserwować</button></form>
     </li>
   {% empty %}

@@ -16,11 +16,16 @@ class Profile(models.Model):
 class Subscription(models.Model):
     """A user follows exactly one of: a tag (and everything under it), an act, or a provision."""
 
+    class Origin(models.TextChoices):
+        MANUAL = "manual", "Dodane ręcznie"
+        QUESTIONNAIRE = "questionnaire", "Z ankiety"
+        AI = "ai", "Dodane przez AI"
+
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="subscriptions")
     tag = models.ForeignKey("tags.Tag", null=True, blank=True, on_delete=models.CASCADE)
     act = models.ForeignKey("laws.Act", null=True, blank=True, on_delete=models.CASCADE)
     provision = models.ForeignKey("laws.Provision", null=True, blank=True, on_delete=models.CASCADE)
-    suggested = models.BooleanField(default=False, help_text="Created from the questionnaire.")
+    origin = models.CharField(max_length=20, choices=Origin.choices, default=Origin.MANUAL)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

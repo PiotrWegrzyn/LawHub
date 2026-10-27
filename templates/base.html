@@ -14,6 +14,7 @@
     </form>
     <nav>
       <a href="{% url 'tags:list' %}">Tematy</a>
+      {% if user.is_authenticated %}<a href="{% url 'connect:page' %}">Połącz AI</a>{% endif %}
       {% if user.is_authenticated %}
         <a href="{% url 'accounts:subscriptions' %}">Obserwowane</a>
         <form method="post" action="{% url 'accounts:logout' %}" class="inline">{% csrf_token %}<button class="link">Wyloguj</button></form>

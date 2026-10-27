@@ -10,6 +10,16 @@ class SignupForm(UserCreationForm):
         model = User
         fields = ("username", "email")
 
+    def __init__(self, *args, allowlist: set[str] | None = None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.allowlist = allowlist
+
+    def clean_email(self):
+        email = self.cleaned_data["email"].strip().lower()
+        if self.allowlist is not None and email not in self.allowlist:
+            raise forms.ValidationError("LawHub jest w zamkniętej becie. Ten adres nie ma zaproszenia.")
+        return email
+
 
 class QuestionnaireForm(forms.Form):
     """Built from the `questionnaire` section of the tag rules, so adding a

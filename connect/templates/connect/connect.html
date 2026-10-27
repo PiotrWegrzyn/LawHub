@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Połącz swoje AI – LawHub{% endblock %}
+{% block content %}
+<h1>Połącz swoje AI</h1>
+<p>Dodaj LawHub jako konektor w swoim asystencie AI. Potem możesz z nim po prostu porozmawiać o tym, czym się zajmujesz,
+a on zaproponuje tematy do obserwowania, wyszuka przepisy i wyjaśni, co mówią.</p>
+
+<h2>Adres serwera MCP</h2>
+<p><code class="copy">{{ mcp_url }}</code></p>
+
+<h3>Claude (claude.ai, aplikacja desktopowa)</h3>
+<ol>
+  <li>Ustawienia → Konektory → Dodaj własny konektor.</li>
+  <li>Wklej adres powyżej i zatwierdź. Claude przekieruje Cię tutaj, żeby zalogować się i zgodzić na dostęp.</li>
+</ol>
+
+<h3>Claude Code</h3>
+<p><code>claude mcp add --transport http lawhub {{ mcp_url }}</code>, a potem <code>/mcp</code> w sesji, żeby się zalogować.</p>
+
+<h3>Inne asystenty</h3>
+<p>Każdy klient MCP, który obsługuje zdalne serwery z logowaniem OAuth, połączy się pod tym adresem.</p>
+
+<h3>Przykład</h3>
+<blockquote>Kupiłem używaną Skodę, do pracy w Krakowie dojeżdżam rowerem, a w weekendy chcę jeździć na Uberze. Jakie tematy w LawHub powinienem obserwować?</blockquote>
+
+<h2>Połączone aplikacje</h2>
+<ul class="results">
+  {% for app in apps %}
+    <li>{{ app.name }}
+      <form method="post" action="{% url 'connect:revoke' app.id %}" class="inline">{% csrf_token %}<button class="link">odłącz</button></form>
+    </li>
+  {% empty %}
+    <p class="muted">Żadne AI nie ma jeszcze dostępu do Twojego konta.</p>
+  {% endfor %}
+</ul>
+{% endblock %}

@@ -27,7 +27,7 @@ class QuestionnaireTests(TestCase):
         self.client.post(reverse("accounts:questionnaire"), {"has_car": "on", "city": "Kraków"})
         slugs = set(Subscription.objects.filter(user=self.user).values_list("tag__slug", flat=True))
         self.assertIn("transport.vehicles.inspection", slugs)
-        self.assertTrue(Subscription.objects.filter(user=self.user, suggested=True).exists())
+        self.assertTrue(Subscription.objects.filter(user=self.user, origin=Subscription.Origin.QUESTIONNAIRE).exists())
         self.assertEqual(self.user.profile.city, "Kraków")
 
     def test_retaking_questionnaire_keeps_manual_subscriptions(self):

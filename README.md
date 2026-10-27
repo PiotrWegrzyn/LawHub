@@ -17,7 +17,7 @@ git clone --depth 1 https://github.com/nalegaluorg/nalegalu ../nalegalu   # ~1.2
 python manage.py migrate
 python manage.py import_nalegalu --seed pl_driving --nalegalu ../nalegalu
 python manage.py createsuperuser
-python manage.py runserver
+uvicorn config.asgi:application --reload   # site + /mcp
 ```
 
 Then open http://127.0.0.1:8000: browse acts and topics, sign up, fill in the
@@ -111,3 +111,16 @@ how a change lands.
 4. Local law (wojewódzkie dzienniki urzędowe, e.g. Kraków's clean transport
    zone), EU law (EUR-Lex), then other countries.
 5. Terraform for hosting.
+
+## Connect your AI (MCP)
+
+Run the site with `uvicorn config.asgi:application`; it serves the MCP
+endpoint at `/mcp` next to the website. Logged-in users find setup steps at
+`/connect/`. Clients log in with OAuth (authorization code + PKCE via
+django-oauth-toolkit, discovered through RFC 9728/8414 metadata, with dynamic
+client registration). Tools: `list_topics`, `search_law`, `get_provision`,
+`my_subscriptions`, `follow_topics`, `unfollow_topics`, `recent_changes`.
+Set `LAWHUB_PUBLIC_URL` to the public https URL in production.
+
+Private beta: `LAWHUB_PRIVATE=1` requires login on every page, and
+`LAWHUB_SIGNUP_ALLOWLIST=a@x.com,b@y.com` limits who can sign up.

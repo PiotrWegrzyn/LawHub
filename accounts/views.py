@@ -1,6 +1,7 @@
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_not_required, login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
@@ -11,8 +12,9 @@ from tags.models import Tag
 from tags.tagger import TagRules
 
 
+@login_not_required
 def signup(request):
-    form = SignupForm(request.POST or None)
+    form = SignupForm(request.POST or None, allowlist=settings.LAWHUB_SIGNUP_ALLOWLIST if settings.LAWHUB_PRIVATE else None)
     if request.method == "POST" and form.is_valid():
         user = form.save()
         Profile.objects.create(user=user)
@@ -32,10 +34,12 @@ def questionnaire(request):
         profile.save()
         # Suggestions are regenerated each time; subscriptions the user added
         # by hand are never touched.
-        request.user.subscriptions.filter(suggested=True).delete()
+        request.user.subscriptions.filter(origin=Subscription.Origin.QUESTIONNAIRE).delete()
         suggested = Tag.objects.filter(slug__in=rules.suggest(answers))
         for tag in suggested:
-            Subscription.objects.get_or_create(user=request.user, tag=tag, defaults={"suggested": True})
+            Subscription.objects.get_or_create(
+                user=request.user, tag=tag, defaults={"origin": Subscription.Origin.QUESTIONNAIRE}
+            )
         messages.success(request, f"Zaproponowaliśmy {suggested.count()} tematów do obserwowania.")
         return redirect("accounts:subscriptions")
     return render(request, "accounts/questionnaire.html", {"form": form})
@@ -43,7 +47,7 @@ def questionnaire(request):
 
 @login_required
 def subscriptions(request):
-    subs = request.user.subscriptions.select_related("tag", "act", "provision__act").order_by("-suggested", "tag__slug")
+    subs = request.user.subscriptions.select_related("tag", "act", "provision__act").order_by("origin", "tag__slug")
     return render(request, "accounts/subscriptions.html", {"subscriptions": subs})
 
 
